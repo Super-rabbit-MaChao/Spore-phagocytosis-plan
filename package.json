@@ -1,0 +1,11 @@
+{
+  "name": "spore-phagocytosis-plan",
+  "private": true,
+  "packageManager": "pnpm@10.32.1",
+  "scripts": {
+    "dev": "pnpm --dir app dev",
+    "build": "pnpm --dir app build",
+    "preview": "pnpm --dir app preview",
+    "lint": "pnpm --dir app lint"
+  }
+}
