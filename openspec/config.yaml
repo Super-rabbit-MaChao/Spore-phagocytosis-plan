@@ -1,20 +1,17 @@
 schema: spec-driven
 
-# 项目上下文（可选）
-# 在创建工件时向 AI 显示此信息。
-# 添加您的技术栈、约定、风格指南、领域知识等。
-# 示例：
-#   context: |
-#     技术栈：TypeScript, React, Node.js
-#     我们使用约定式提交
-#     领域：电商平台
+context: |
+  技术栈：Vite + React + TypeScript，包管理 pnpm；应用在 app/。
+  领域：《孢子进化》微生物翻格探索游戏；规则以 游戏设定/ 为准。
+  OpenSpec 变更命名必须使用三位数字前缀：NNN-kebab-case（如 002-species-runtime-state）。
+  取号：查看 openspec/changes/ 与 archive/ 最大编号后 +1；禁止无编号变更名。
+  一个变更只做一个可验证功能。详见 .cursor/rules/openspec-change-numbering.mdc。
 
-# 每个工件的规则（可选）
-# 为特定工件添加自定义规则。
-# 示例：
-#   rules:
-#     proposal:
-#       - 保持提案在500字以内
-#       - 始终包含"非目标"部分
-#     tasks:
-#       - 将任务分解为最多2小时的块
+rules:
+  proposal:
+    - 变更目录名必须为 NNN-kebab-case；proposal 文首注明编号与名称
+    - 明确写出可验证标准（如何手动验收本功能）
+    - 只描述这一个功能，不把后续模块塞进同一提案
+  tasks:
+    - 任务按可验收步骤拆分
+    - 最后一组必须包含验收任务
