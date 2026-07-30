@@ -29,3 +29,7 @@ export function useSpendActionPoint(): () => void {
 export function useEndTurn(): () => void {
   return useMapSessionContext().endTurn
 }
+
+export function useReplaceMapSession(): (next: MapSession) => void {
+  return useMapSessionContext().replaceSession
+}

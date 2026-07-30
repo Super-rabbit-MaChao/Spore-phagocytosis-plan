@@ -11,6 +11,8 @@ export type MapSessionContextValue = {
   spendActionPoint: () => void
   /** 结束回合：AP 重置，回合 +1 */
   endTurn: () => void
+  /** 用完整会话快照替换当前会话（翻格等动作） */
+  replaceSession: (next: MapSession) => void
 }
 
 export const MapSessionContext = createContext<MapSessionContextValue | null>(

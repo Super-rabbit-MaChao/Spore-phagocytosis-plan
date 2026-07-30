@@ -41,6 +41,10 @@ export function MapSessionProvider({ children }: MapSessionProviderProps) {
     })
   }, [])
 
+  const replaceSession = useCallback((next: MapSession) => {
+    setSession(next)
+  }, [])
+
   return (
     <MapSessionContext.Provider
       value={{
@@ -49,6 +53,7 @@ export function MapSessionProvider({ children }: MapSessionProviderProps) {
         clearSession,
         spendActionPoint,
         endTurn,
+        replaceSession,
       }}
     >
       {children}

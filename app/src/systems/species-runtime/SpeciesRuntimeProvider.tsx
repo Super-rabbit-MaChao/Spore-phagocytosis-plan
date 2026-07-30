@@ -2,6 +2,7 @@ import { useCallback, useState, type ReactNode } from 'react'
 import { SpeciesRuntimeContext } from './context'
 import { createDefaultBacillusRuntime } from './defaults'
 import { applyFeed } from './feed'
+import { applySpendEnergy } from './energy'
 import {
   applyRealtimeRecovery,
   fastForwardRecovery as advanceRecovery,
@@ -75,6 +76,29 @@ export function SpeciesRuntimeProvider({ children }: SpeciesRuntimeProviderProps
     })
   }, [])
 
+  const spendEnergy = useCallback((amount: number) => {
+    setState((current) => {
+      const runtime = applySpendEnergy(current.runtime, amount)
+      if (runtime === current.runtime) {
+        return current
+      }
+      return { ...current, runtime }
+    })
+  }, [])
+
+  const setEnergy = useCallback((energy: number) => {
+    setState((current) => {
+      const next = Math.max(0, Math.floor(energy))
+      if (current.runtime.energy === next) {
+        return current
+      }
+      return {
+        ...current,
+        runtime: { ...current.runtime, energy: next },
+      }
+    })
+  }, [])
+
   return (
     <SpeciesRuntimeContext.Provider
       value={{
@@ -83,6 +107,8 @@ export function SpeciesRuntimeProvider({ children }: SpeciesRuntimeProviderProps
         settleRecovery,
         fastForwardRecovery,
         fillPopulationToCap,
+        spendEnergy,
+        setEnergy,
       }}
     >
       {children}

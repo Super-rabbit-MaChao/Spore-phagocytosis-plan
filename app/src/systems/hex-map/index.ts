@@ -24,4 +24,5 @@ export {
   useClearMapSession,
   useSpendActionPoint,
   useEndTurn,
+  useReplaceMapSession,
 } from './useMapSession'

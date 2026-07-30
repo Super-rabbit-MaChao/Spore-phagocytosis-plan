@@ -29,3 +29,11 @@ export function useFastForwardRecovery(): (intervals?: number) => void {
 export function useFillPopulationToCap(): () => void {
   return useSpeciesRuntimeContext().fillPopulationToCap
 }
+
+export function useSpendEnergy(): (amount: number) => void {
+  return useSpeciesRuntimeContext().spendEnergy
+}
+
+export function useSetEnergy(): (energy: number) => void {
+  return useSpeciesRuntimeContext().setEnergy
+}

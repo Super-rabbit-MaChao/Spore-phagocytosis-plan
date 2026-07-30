@@ -8,10 +8,13 @@ export {
   RECOVERY_INTERVAL_MS,
 } from './recovery'
 export { SpeciesRuntimeProvider } from './SpeciesRuntimeProvider'
+export { applySpendEnergy } from './energy'
 export {
   useSpeciesRuntime,
   useSpeciesFeed,
   useSettleRecovery,
   useFastForwardRecovery,
   useFillPopulationToCap,
+  useSpendEnergy,
+  useSetEnergy,
 } from './useSpeciesRuntime'

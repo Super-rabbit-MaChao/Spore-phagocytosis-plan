@@ -10,6 +10,10 @@ export type SpeciesRuntimeContextValue = {
   fastForwardRecovery: (intervals?: number) => void
   /** 调试：族群填满至上限 */
   fillPopulationToCap: () => void
+  /** 扣除能量；不足则拒绝 */
+  spendEnergy: (amount: number) => void
+  /** 调试：将能量设为指定值 */
+  setEnergy: (energy: number) => void
 }
 
 export const SpeciesRuntimeContext =
