@@ -289,6 +289,13 @@ h1 {
   filter: brightness(1.08);
 }
 
+.hex-tile-movable polygon {
+  stroke: var(--accent);
+  stroke-width: 2;
+  stroke-dasharray: 4 3;
+  filter: brightness(1.05);
+}
+
 .hex-tile-revealed polygon {
   fill: color-mix(in srgb, var(--accent-soft) 70%, white);
 }

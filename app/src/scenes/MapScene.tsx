@@ -1,6 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import { AppShell } from '@/app/AppShell'
 import {
+  applyMoveColony,
+  isMovableTile,
+  moveFailMessage,
+} from '@/systems/colony-move'
+import {
   axialKey,
   axialToPixel,
   hexCornerPoints,
@@ -36,10 +41,10 @@ type MapHexGridProps = {
   map: HexMap
   session: MapSession
   energy: number
-  onFlip: (target: AxialCoord) => void
+  onTileClick: (target: AxialCoord) => void
 }
 
-function MapHexGrid({ map, session, energy, onFlip }: MapHexGridProps) {
+function MapHexGrid({ map, session, energy, onTileClick }: MapHexGridProps) {
   const layout = useMemo(() => {
     const placed = map.tiles.map((tile) => {
       const { x, y } = axialToPixel(tile.q, tile.r, HEX_SIZE)
@@ -65,27 +70,32 @@ function MapHexGrid({ map, session, energy, onFlip }: MapHexGridProps) {
       className="hex-map-svg"
       viewBox={layout.viewBox}
       role="img"
-      aria-label="六边形地图：点击邻接迷雾可翻格"
+      aria-label="六边形地图：邻接迷雾可翻格，邻接已揭示可移动"
     >
       {layout.placed.map(({ tile, x, y }) => {
         const isCore = axialKey(tile.q, tile.r) === coreKey
         const flippable = isFlippableTile(session, tile, energy)
+        const movable = isMovableTile(session, tile, energy)
         const stateClass =
           tile.visibility === 'fog' ? 'hex-tile-fog' : 'hex-tile-revealed'
         const contentClass =
           tile.visibility === 'revealed' && tile.content === 'resource'
             ? 'hex-tile-resource'
             : ''
-        const flippableClass = flippable ? 'hex-tile-flippable' : ''
+        const actionClass = flippable
+          ? 'hex-tile-flippable'
+          : movable
+            ? 'hex-tile-movable'
+            : ''
         return (
           <g
             key={axialKey(tile.q, tile.r)}
-            className={`hex-tile ${stateClass} ${contentClass} ${flippableClass}`.trim()}
+            className={`hex-tile ${stateClass} ${contentClass} ${actionClass}`.trim()}
             transform={`translate(${x} ${y})`}
             onClick={() => {
-              onFlip({ q: tile.q, r: tile.r })
+              onTileClick({ q: tile.q, r: tile.r })
             }}
-            style={{ cursor: flippable ? 'pointer' : 'pointer' }}
+            style={{ cursor: 'pointer' }}
           >
             <polygon points={hexCornerPoints(0, 0, HEX_SIZE * 0.95)} />
             {tile.visibility === 'revealed' && tile.content === 'resource' ? (
@@ -134,17 +144,37 @@ export function MapScene() {
     setHint(message)
   }
 
-  const handleFlip = (target: AxialCoord) => {
+  const handleTileClick = (target: AxialCoord) => {
     if (!session) {
       return
     }
-    const result = applyFlipTile(session, target, species.energy)
-    if (!result.ok) {
-      showHint(flipFailMessage(result.reason))
+
+    const tile = session.map.tiles.find(
+      (t) => t.q === target.q && t.r === target.r,
+    )
+    if (!tile) {
       return
     }
-    replaceSession(result.session)
-    spendEnergy(result.energySpent)
+
+    if (tile.visibility === 'fog') {
+      const flip = applyFlipTile(session, target, species.energy)
+      if (!flip.ok) {
+        showHint(flipFailMessage(flip.reason))
+        return
+      }
+      replaceSession(flip.session)
+      spendEnergy(flip.energySpent)
+      setHint(null)
+      return
+    }
+
+    const move = applyMoveColony(session, target, species.energy)
+    if (!move.ok) {
+      showHint(moveFailMessage(move.reason))
+      return
+    }
+    replaceSession(move.session)
+    spendEnergy(move.energySpent)
     setHint(null)
   }
 
@@ -173,7 +203,7 @@ export function MapScene() {
       <section className="scene-block">
         <h1>地图探索</h1>
         <p className="lede">
-          点击与核心相邻的迷雾格可翻开（耗 1 行动点与 1 能量）。移动与采集尚未接入。
+          邻接迷雾可翻格（1 AP + 1 能量）；邻接已揭示可移动（1 AP + 2 能量）。采集尚未接入。
         </p>
         <div className="game-viewport hex-map-viewport">
           {session ? (
@@ -202,10 +232,10 @@ export function MapScene() {
                 map={session.map}
                 session={session}
                 energy={species.energy}
-                onFlip={handleFlip}
+                onTileClick={handleTileClick}
               />
               <p className="hex-map-legend">
-                实心圆为核心 · 浅格已揭示 · 深格迷雾 · 可翻格有描边高亮
+                实心圆为核心 · 可翻格描边 · 可移动格虚线描边
                 {session.map.tiles.some(
                   (t: HexTile) =>
                     t.visibility === 'revealed' && t.content === 'resource',
