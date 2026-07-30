@@ -5,12 +5,16 @@ import {
   axialToPixel,
   hexCornerPoints,
   useClearMapSession,
+  useEndTurn,
   useMapSession,
+  useSpendActionPoint,
   useStartMapSession,
   type HexMap,
 } from '@/systems/hex-map'
+import { canSpendActionPoint } from '@/systems/turn-action-points'
 
 const HEX_SIZE = 22
+const isDev = import.meta.env.DEV
 
 function MapHexGrid({ map }: { map: HexMap }) {
   const layout = useMemo(() => {
@@ -70,6 +74,8 @@ export function MapScene() {
   const session = useMapSession()
   const startNewSession = useStartMapSession()
   const clearSession = useClearMapSession()
+  const spendActionPoint = useSpendActionPoint()
+  const endTurn = useEndTurn()
 
   useEffect(() => {
     startNewSession()
@@ -78,18 +84,27 @@ export function MapScene() {
     }
   }, [startNewSession, clearSession])
 
+  const canSpend = session ? canSpendActionPoint(session) : false
+
   return (
     <AppShell
       sceneName="地图"
       actions={[
-        { label: '返回培养皿', to: '/petri-dish', primary: true },
+        { label: '返回培养皿', to: '/petri-dish' },
+        {
+          label: '结束回合',
+          primary: true,
+          onClick: () => {
+            endTurn()
+          },
+        },
         { label: '主菜单', to: '/' },
       ]}
     >
       <section className="scene-block">
         <h1>地图探索</h1>
         <p className="lede">
-          每次进入生成新会话。开局落入安全格并揭示周围邻格。翻格、移动与回合结算尚未接入。
+          每回合 3 行动点。可结束回合重置；翻格与移动尚未接入。
         </p>
         <div className="game-viewport hex-map-viewport">
           {session ? (
@@ -98,6 +113,12 @@ export function MapScene() {
                 会话种子 <code>{session.seed.toString(16)}</code>
                 <span className="hex-map-session-core">
                   · 核心 ({session.map.core.q},{session.map.core.r})
+                </span>
+              </p>
+              <p className="hex-map-turn-hud" aria-live="polite">
+                回合 {session.turnIndex}
+                <span className="hex-map-ap">
+                  · 行动点 <strong>{session.actionPoints}</strong>
                 </span>
               </p>
               <MapHexGrid map={session.map} />
@@ -109,6 +130,21 @@ export function MapScene() {
                   ? ' · 点为资源'
                   : ''}
               </p>
+              {isDev ? (
+                <div className="hex-map-debug">
+                  <p className="hex-map-debug-label">调试</p>
+                  <button
+                    type="button"
+                    className="btn"
+                    disabled={!canSpend}
+                    onClick={() => {
+                      spendActionPoint()
+                    }}
+                  >
+                    消耗 1 AP
+                  </button>
+                </div>
+              ) : null}
             </>
           ) : (
             <p className="hex-map-legend">正在创建地图会话…</p>

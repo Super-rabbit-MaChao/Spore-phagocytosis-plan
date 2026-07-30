@@ -21,3 +21,11 @@ export function useStartMapSession(): () => void {
 export function useClearMapSession(): () => void {
   return useMapSessionContext().clearSession
 }
+
+export function useSpendActionPoint(): () => void {
+  return useMapSessionContext().spendActionPoint
+}
+
+export function useEndTurn(): () => void {
+  return useMapSessionContext().endTurn
+}

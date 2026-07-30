@@ -329,6 +329,44 @@ h1 {
   font-size: 0.85em;
 }
 
+.hex-map-turn-hud {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--ink);
+  text-align: center;
+}
+
+.hex-map-ap strong {
+  font-variant-numeric: tabular-nums;
+  font-size: 1.15em;
+}
+
+.hex-map-debug {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  align-items: center;
+  padding-top: 0.35rem;
+  border-top: 1px dashed var(--line);
+  width: min(100%, 28rem);
+}
+
+.hex-map-debug-label {
+  margin: 0;
+  width: 100%;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.hex-map-debug .btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 .hex-grid-sketch span {
   width: 28px;
   height: 32px;

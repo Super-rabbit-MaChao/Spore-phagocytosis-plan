@@ -7,6 +7,10 @@ export type MapSessionContextValue = {
   startNewSession: () => void
   /** 离开地图时调用：丢弃当前会话 */
   clearSession: () => void
+  /** 消耗 1 行动点；不足则拒绝 */
+  spendActionPoint: () => void
+  /** 结束回合：AP 重置，回合 +1 */
+  endTurn: () => void
 }
 
 export const MapSessionContext = createContext<MapSessionContextValue | null>(

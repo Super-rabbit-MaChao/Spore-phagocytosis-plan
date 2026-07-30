@@ -31,4 +31,8 @@ export type MapSession = {
   id: string
   seed: number
   map: HexMap
+  /** 当前回合剩余行动点 */
+  actionPoints: number
+  /** 当前回合序号，从 1 起 */
+  turnIndex: number
 }
