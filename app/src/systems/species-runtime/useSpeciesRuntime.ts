@@ -1,4 +1,5 @@
 import { useContext } from 'react'
+import type { CarryGain } from './carry'
 import { SpeciesRuntimeContext } from './context'
 import type { SpeciesRuntime } from './types'
 
@@ -36,4 +37,11 @@ export function useSpendEnergy(): (amount: number) => void {
 
 export function useSetEnergy(): (energy: number) => void {
   return useSpeciesRuntimeContext().setEnergy
+}
+
+export function useCollectCarry(): (
+  energySpent: number,
+  gain: CarryGain,
+) => void {
+  return useSpeciesRuntimeContext().collectCarry
 }

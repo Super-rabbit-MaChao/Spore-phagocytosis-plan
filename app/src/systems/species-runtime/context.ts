@@ -1,4 +1,5 @@
 import { createContext } from 'react'
+import type { CarryGain } from './carry'
 import type { SpeciesRuntime } from './types'
 
 export type SpeciesRuntimeContextValue = {
@@ -14,6 +15,8 @@ export type SpeciesRuntimeContextValue = {
   spendEnergy: (amount: number) => void
   /** 调试：将能量设为指定值 */
   setEnergy: (energy: number) => void
+  /** 采集结算：扣消耗能量并加入产出 */
+  collectCarry: (energySpent: number, gain: CarryGain) => void
 }
 
 export const SpeciesRuntimeContext =

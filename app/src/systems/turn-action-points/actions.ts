@@ -20,7 +20,7 @@ export function applySpendActionPoint(session: MapSession): MapSession {
 
 /**
  * 结束回合：行动点重置为上限，回合序号 +1。
- * 本阶段不做环境维持结算。
+ * 不改地图格子（采空资源本局不再生）。本阶段不做环境维持结算。
  */
 export function applyEndTurn(session: MapSession): MapSession {
   return {

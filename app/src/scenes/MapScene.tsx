@@ -6,6 +6,12 @@ import {
   moveFailMessage,
 } from '@/systems/colony-move'
 import {
+  applyCollect,
+  COLLECT_ENERGY_COST,
+  collectFailMessage,
+  setCoreTileResource,
+} from '@/systems/resource-collect'
+import {
   axialKey,
   axialToPixel,
   hexCornerPoints,
@@ -21,6 +27,7 @@ import {
   type MapSession,
 } from '@/systems/hex-map'
 import {
+  useCollectCarry,
   useSetEnergy,
   useSpeciesRuntime,
   useSpendEnergy,
@@ -70,7 +77,7 @@ function MapHexGrid({ map, session, energy, onTileClick }: MapHexGridProps) {
       className="hex-map-svg"
       viewBox={layout.viewBox}
       role="img"
-      aria-label="六边形地图：邻接迷雾可翻格，邻接已揭示可移动"
+      aria-label="六边形地图：邻接迷雾可翻格，邻接已揭示可移动，当前格可采集"
     >
       {layout.placed.map(({ tile, x, y }) => {
         const isCore = axialKey(tile.q, tile.r) === coreKey
@@ -118,6 +125,7 @@ export function MapScene() {
   const replaceSession = useReplaceMapSession()
   const species = useSpeciesRuntime()
   const spendEnergy = useSpendEnergy()
+  const collectCarry = useCollectCarry()
   const setEnergy = useSetEnergy()
   const [hint, setHint] = useState<string | null>(null)
 
@@ -178,6 +186,20 @@ export function MapScene() {
     setHint(null)
   }
 
+  const handleCollect = () => {
+    if (!session) {
+      return
+    }
+    const collect = applyCollect(session, species.energy)
+    if (!collect.ok) {
+      showHint(collectFailMessage(collect.reason))
+      return
+    }
+    replaceSession(collect.session)
+    collectCarry(collect.energySpent, collect.gained)
+    setHint(null)
+  }
+
   const handleFogNeighbor = () => {
     if (!session) {
       return
@@ -203,7 +225,7 @@ export function MapScene() {
       <section className="scene-block">
         <h1>地图探索</h1>
         <p className="lede">
-          邻接迷雾可翻格（1 AP + 1 能量）；邻接已揭示可移动（1 AP + 2 能量）。采集尚未接入。
+          邻接迷雾可翻格（1 AP + 1 能量）；邻接已揭示可移动（1 AP + 2 能量）。当前格可采集（1 AP + {COLLECT_ENERGY_COST} 能量）。
         </p>
         <div className="game-viewport hex-map-viewport">
           {session ? (
@@ -222,12 +244,27 @@ export function MapScene() {
                 <span className="hex-map-ap">
                   · 能量 <strong>{species.energy}</strong>
                 </span>
+                <span className="hex-map-ap">
+                  · 水分 <strong>{species.moisture}</strong>
+                </span>
+                <span className="hex-map-ap">
+                  · 营养 <strong>{species.nutrition}</strong>
+                </span>
               </p>
               {hint ? (
                 <p className="hex-map-hint" role="status" aria-live="polite">
                   {hint}
                 </p>
               ) : null}
+              <div className="hex-map-actions">
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={handleCollect}
+                >
+                  采集
+                </button>
+              </div>
               <MapHexGrid
                 map={session.map}
                 session={session}
@@ -271,6 +308,15 @@ export function MapScene() {
                     }}
                   >
                     能量清零
+                  </button>
+                  <button
+                    type="button"
+                    className="btn"
+                    onClick={() => {
+                      replaceSession(setCoreTileResource(session))
+                    }}
+                  >
+                    当前格设为资源
                   </button>
                 </div>
               ) : null}

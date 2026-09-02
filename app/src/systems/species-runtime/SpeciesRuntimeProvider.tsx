@@ -2,6 +2,7 @@ import { useCallback, useState, type ReactNode } from 'react'
 import { SpeciesRuntimeContext } from './context'
 import { createDefaultBacillusRuntime } from './defaults'
 import { applyFeed } from './feed'
+import { applyCollectCarry, type CarryGain } from './carry'
 import { applySpendEnergy } from './energy'
 import {
   applyRealtimeRecovery,
@@ -99,6 +100,16 @@ export function SpeciesRuntimeProvider({ children }: SpeciesRuntimeProviderProps
     })
   }, [])
 
+  const collectCarry = useCallback((energySpent: number, gain: CarryGain) => {
+    setState((current) => {
+      const runtime = applyCollectCarry(current.runtime, energySpent, gain)
+      if (runtime === current.runtime) {
+        return current
+      }
+      return { ...current, runtime }
+    })
+  }, [])
+
   return (
     <SpeciesRuntimeContext.Provider
       value={{
@@ -109,6 +120,7 @@ export function SpeciesRuntimeProvider({ children }: SpeciesRuntimeProviderProps
         fillPopulationToCap,
         spendEnergy,
         setEnergy,
+        collectCarry,
       }}
     >
       {children}

@@ -10,6 +10,11 @@ export {
 export { SpeciesRuntimeProvider } from './SpeciesRuntimeProvider'
 export { applySpendEnergy } from './energy'
 export {
+  applyCollectCarry,
+  applyGainCarry,
+} from './carry'
+export type { CarryGain } from './carry'
+export {
   useSpeciesRuntime,
   useSpeciesFeed,
   useSettleRecovery,
@@ -17,4 +22,5 @@ export {
   useFillPopulationToCap,
   useSpendEnergy,
   useSetEnergy,
+  useCollectCarry,
 } from './useSpeciesRuntime'

@@ -9,3 +9,4 @@
 - `turn-action-points/` — 回合行动点：开局 3 点、扣点、结束回合重置
 - `tile-flip/` — 翻开核心相邻迷雾格（耗 AP + 能量）
 - `colony-move/` — 核心移动到相邻已揭示格（耗 AP + 能量）
+- `resource-collect/` — 采集当前核心格资源（耗 AP + 能量；一次采空）
