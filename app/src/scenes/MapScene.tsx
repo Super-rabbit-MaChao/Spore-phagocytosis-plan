@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { AppShell } from '@/app/AppShell'
 import {
   applyMoveColony,
@@ -11,6 +12,7 @@ import {
   collectFailMessage,
   setCoreTileResource,
 } from '@/systems/resource-collect'
+import { applyEvacuate, evacuateEnergyCost, evacuateFailMessage } from '@/systems/spore-evacuate'
 import {
   axialKey,
   axialToPixel,
@@ -117,6 +119,7 @@ function MapHexGrid({ map, session, energy, onTileClick }: MapHexGridProps) {
 }
 
 export function MapScene() {
+  const navigate = useNavigate()
   const session = useMapSession()
   const startNewSession = useStartMapSession()
   const clearSession = useClearMapSession()
@@ -207,11 +210,30 @@ export function MapScene() {
     replaceSession(fogOneCoreNeighbor(session))
   }
 
+  const handleEvacuate = () => {
+    if (!session) {
+      return
+    }
+    const evacuate = applyEvacuate(session, species.energy)
+    if (!evacuate.ok) {
+      showHint(evacuateFailMessage(evacuate.reason))
+      return
+    }
+    spendEnergy(evacuate.energySpent)
+    clearSession()
+    navigate('/petri-dish')
+  }
+
+  const evacuateCost = evacuateEnergyCost(species.energy)
+
   return (
     <AppShell
       sceneName="地图"
       actions={[
-        { label: '返回培养皿', to: '/petri-dish' },
+        {
+          label: `孢子化撤离（${evacuateCost} 能量）`,
+          onClick: handleEvacuate,
+        },
         {
           label: '结束回合',
           primary: true,
@@ -225,7 +247,7 @@ export function MapScene() {
       <section className="scene-block">
         <h1>地图探索</h1>
         <p className="lede">
-          邻接迷雾可翻格（1 AP + 1 能量）；邻接已揭示可移动（1 AP + 2 能量）。当前格可采集（1 AP + {COLLECT_ENERGY_COST} 能量）。
+          邻接迷雾可翻格（1 AP + 1 能量）；邻接已揭示可移动（1 AP + 2 能量）。当前格可采集（1 AP + {COLLECT_ENERGY_COST} 能量）。底栏可孢子化撤离。
         </p>
         <div className="game-viewport hex-map-viewport">
           {session ? (
